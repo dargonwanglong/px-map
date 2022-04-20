@@ -30,7 +30,7 @@
     "app-localize-behavior": "^2.0.0",
     "polymer": "#1.9 - 2",
     "px-d3-imports": "^3.0.0",
-    "leaflet": "^1.3.4",
+    "leaflet": "1.7.1",
     "leaflet.markercluster": "Leaflet/Leaflet.markercluster#v1.4.1",
     "leaflet-bing-tiles": "git+https://github.com/ServiceMax-Engineering/leaflet-bing-tiles.git#1.0.3",
     "leaflet-google-tiles": "ge-smallworld/leaflet-google-layer#^1.0.0",

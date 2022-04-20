@@ -1,3 +1,8 @@
+v3.19.13
+===================
+## Bug Fix:
+* Restrict leaflet to 1.7.1 to fix build issue.
+
 v3.19.12
 ===================
 ## Enhancement:
