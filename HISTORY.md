@@ -1,3 +1,8 @@
+v3.19.14
+===================
+## Bug Fix:
+* Update map after subdomains changed.
+
 v3.19.13
 ===================
 ## Bug Fix:
