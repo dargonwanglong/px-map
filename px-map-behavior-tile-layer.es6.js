@@ -75,7 +75,7 @@
         type: String,
         value: 'abc',
         observer: 'shouldUpdateInst'
-      },
+      }
     },
 
     canAddInst() {
@@ -89,6 +89,9 @@
     updateInst(lastOptions, nextOptions) {
       if (lastOptions.url !== nextOptions.url) {
         this.elementInst.setUrl(nextOptions.url);
+      }
+      if (lastOptions.subdomains !== nextOptions.subdomains) {
+        this.elementInst.setSubdomains(nextOptions.subdomains);
       }
     },
 
