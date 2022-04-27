@@ -57,6 +57,9 @@ limitations under the License.
           zoom="{{props.zoom.value}}"
           lat="{{props.lat.value}}"
           lng="{{props.lng.value}}"
+          draw-toolbar-position="{{props.drawToolbarPosition.value}}"
+          show-draw-toolbar="{{props.showDrawToolbar.value}}"
+          draw-toolbar-language="{{props.drawToolbarLanguage.value}}"
           flex-to-size="{{props.flexToSize.value}}"
           disable-scroll-zoom="{{props.disableScrollZoom.value}}"
           disable-touch-zoom="{{props.disableTouchZoom.value}}"
@@ -64,6 +67,11 @@ limitations under the License.
           disable-dragging="{{props.disableDragging.value}}"
           attribution-prefix='<a href="http://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> | &copy; <a href="http://osm.org/copyright">OpenStreetMap contributors</a>'>
           <px-map-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"></px-map-tile-layer>
+          <px-map-marker-static
+            lat="{{props.lat.value}}"
+            lng="{{props.lng.value}}"
+            type="{{props.type.value}}">
+          </px-map-marker-static>
         </px-map>
       </div>
     </px-demo-component>
@@ -89,6 +97,8 @@ limitations under the License.
 </dom-module>
 
   <script>
+
+
     Polymer({
       is: 'px-map-demo',
 
@@ -151,6 +161,18 @@ limitations under the License.
         }
       },
 
+      listeners: {
+        'px-map-moved': 'mapMove',
+        'px-map-draw-end': 'drawEnd'
+      },
+
+      mapMove: function(evt) {
+        var markers = Polymer.dom(evt).rootTarget.getVisibleMarkers();
+        console.log('There are ' + markers.length + ' markers visible on the map.');
+      },
+      drawEnd: function(evt) {
+        console.log('There is the feature collection for the drawn polygon.', evt.detail);
+      },
       /**
        * A reference for `this.props`. Read the documentation there.
        *
@@ -176,6 +198,34 @@ limitations under the License.
           type: Number,
           defaultValue: -122.4312,
           inputType: 'text'
+        },
+
+        drawToolbarPosition: {
+          type: String,
+          defaultValue: 'bottomright',
+          inputType: 'dropdown',
+          inputChoices: ['topleft', 'topright', 'bottomleft', 'bottomright']
+        },
+
+        showDrawToolbar: {
+          type: Boolean,
+          defaultValue: false,
+          inputType: 'toggle',
+        },
+
+        drawToolbarLanguage: {
+          type: String,
+          defaultValue: 'en',
+          inputType: 'dropdown',
+          inputChoices: ['en', 'zh', 'es', 'ru']
+        },
+
+        type: {
+          inputLabel: 'Marker Type',
+          type: String,
+          defaultValue: 'info',
+          inputType: 'dropdown',
+          inputChoices: ['important', 'warning', 'info', 'unknown']
         },
 
         flexToSize: {
