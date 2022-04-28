@@ -1,3 +1,8 @@
+v3.19.15
+===================
+## New Feature:
+* Add leaflet-geoman drawing tool.
+
 v3.19.14
 ===================
 ## Bug Fix:

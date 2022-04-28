@@ -92,7 +92,7 @@
 
       this._knownMarkers = (this._knownMarkers || new Map());
 
-      PxMapBehavior.LeafletRootImpl.addInst.call(this);
+      PxMapBehavior.DrawToolbarImpl.addInst.call(this);
     },
 
     removeInst(parent) {
@@ -294,6 +294,163 @@
       this._fitMapToMarkers();
       return true;
     }
+  };
+
+  /**
+   *
+   * @polymerBehavior PxMapBehavior.DrawToolbarImpl
+   */
+  PxMapBehavior.DrawToolbarImpl = {
+    properties: {
+      /**
+       * The position of the drawing toolbal to display.
+       * Available positions are: 'topleft', 'topright', 'bottomleft', 'bottomright'
+       */
+      drawToolbarPosition: {
+        type: String,
+        value: 'topleft',
+        notify: true,
+        observer: 'shouldUpdateInst'
+      },
+
+      /**
+       * Indicate whether to show the drawing toolbar on map.
+       */
+      showDrawToolbar: {
+        type: Boolean,
+        value: false,
+        notify: true,
+        observer: 'shouldUpdateInst'
+      },
+
+      /**
+       * The language code for the drawing controls, used for i18N.
+       * Currently available languages are: cz, da, de, el, en, es, fa, fr, hu, id, it, nl, no, pl, pt_br, ro, ru, sv, tr, ua, zh and zh_tw.
+       */
+      drawToolbarLanguage: {
+        type: String,
+        value: 'en',
+        notify: true,
+        observer: 'shouldUpdateInst'
+      },
+
+      /**
+       * The controls setting for the drawing toolbar.
+       *
+       * See https://github.com/geoman-io/leaflet-geoman
+       */
+      drawControls: {
+        type: Object,
+        value: function() {
+          return {
+            drawMarker: false,
+            drawCircleMarker: false,
+            drawPolyline: false,
+            rotateMode: false
+          };
+        }
+      }
+    },
+
+    addInst(parent) {
+      PxMapBehavior.LeafletRootImpl.addInst.call(this, parent);
+
+      if (this.showDrawToolbar) {
+        this._addControls(this.drawToolbarPosition, this.drawControls, this.drawToolbarLanguage);
+      }
+    },
+
+    removeInst() {
+      this._removeControls();
+      PxMapBehavior.LeafletRootImpl.removeInst.call(this);
+    },
+
+    updateInst(lastOptions, nextOptions) {
+      if (lastOptions.showDrawToolbar !== nextOptions.showDrawToolbar || lastOptions.drawToolbarPosition !== nextOptions.drawToolbarPosition) {
+        // cannot use toggleControls as the drawControls setting cannot apply to
+        if (nextOptions.showDrawToolbar) {
+          this._addControls(nextOptions.drawToolbarPosition, nextOptions.drawControls, nextOptions.drawToolbarLanguage);
+        } else {
+          this._removeControls();
+        }
+      }
+      if(lastOptions.drawToolbarLanguage !== nextOptions.drawToolbarLanguage) {
+        this.elementInst.pm.setLang(nextOptions.drawToolbarLanguage);
+      }
+
+      PxMapBehavior.LeafletRootImpl.updateInst.call(this, lastOptions, nextOptions);
+    },
+
+    getInstOptions() {
+      const options = PxMapBehavior.LeafletRootImpl.getInstOptions.call(this);
+      options.drawToolbarPosition = this.drawToolbarPosition;
+      options.showDrawToolbar = this.showDrawToolbar;
+      options.drawToolbarLanguage = this.drawToolbarLanguage;
+      options.drawControls = this.drawControls;
+
+      return options;
+    },
+
+    /**
+     * Add the controls to drawing toolbar and bind the events
+     * @param {*} position
+     * @param {*} drawControls
+     * @param {*} language
+     */
+    _addControls(position, drawControls, language) {
+      const options = Object.assign({position: position}, drawControls);
+      this.elementInst.pm.addControls(options);
+      this.elementInst.pm.setLang(language);
+
+      const drawEndFn = this._handleDrawEnd.bind(this);
+      const layerCreatedFn = this._handleShapeLayerCreated.bind(this);
+      this.bindEvents({
+        'pm:drawend' : drawEndFn,
+        'pm:create' : layerCreatedFn,
+        'pm:remove': drawEndFn
+      });
+    },
+
+    /**
+     * Remove the controls and drawn layers
+     */
+    _removeControls() {
+      // remove all drawn layers
+      const layers = this.elementInst.pm.getGeomanDrawLayers();
+      layers.forEach(layer => layer.remove());
+      this.elementInst.pm.removeControls();
+    },
+
+    /**
+     * Handle when the layer or shape is drawn/created and listen the layer's edit event.
+     *
+     *
+     * @param {*} e
+     */
+    _handleShapeLayerCreated(e) {
+      e.layer.on('pm:edit', ev => {
+        this._handleDrawEnd(ev);
+      });
+
+    },
+
+    /**
+     * Handle the event when the layer is drawn/edited/removed/cutted etc.
+     * Return the feature colletion of drawn polygons
+     *
+     * @param {*} evt
+     */
+    _handleDrawEnd(evt) {
+      const layerFeatureCollection = this.elementInst.pm.getGeomanDrawLayers(true).toGeoJSON();
+      this.fire('px-map-draw-end', layerFeatureCollection);
+    }
+    /**
+     * Fired when the layer is drawn/edited by the user via the drawing tool.
+     *
+     *   * {Object} detail - Contains the event details, the feature colletion of drawn polygons.
+     *
+     * @event px-map-draw-end
+     */
   };
 
   /**
@@ -827,6 +984,7 @@
     PxMapBehavior.Element,
     PxMapBehavior.ParentLayer,
     PxMapBehavior.LeafletRootImpl,
+    PxMapBehavior.DrawToolbarImpl,
     PxMapBehavior.TrackMarkersImpl
   ];
 })();
