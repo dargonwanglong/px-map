@@ -60,6 +60,7 @@ limitations under the License.
           draw-toolbar-position="{{props.drawToolbarPosition.value}}"
           show-draw-toolbar="{{props.showDrawToolbar.value}}"
           draw-toolbar-language="{{props.drawToolbarLanguage.value}}"
+          draw-layers-removal-factor="{{props.drawLayersRemovalFactor.value}}"
           flex-to-size="{{props.flexToSize.value}}"
           disable-scroll-zoom="{{props.disableScrollZoom.value}}"
           disable-touch-zoom="{{props.disableTouchZoom.value}}"
@@ -163,14 +164,14 @@ limitations under the License.
 
       listeners: {
         'px-map-moved': 'mapMove',
-        'px-map-draw-end': 'drawEnd'
+        'px-map-draw-finished': 'drawFinished'
       },
 
       mapMove: function(evt) {
         var markers = Polymer.dom(evt).rootTarget.getVisibleMarkers();
         console.log('There are ' + markers.length + ' markers visible on the map.');
       },
-      drawEnd: function(evt) {
+      drawFinished: function(evt) {
         console.log('There is the feature collection for the drawn polygon.', evt.detail);
       },
       /**
@@ -202,7 +203,7 @@ limitations under the License.
 
         drawToolbarPosition: {
           type: String,
-          defaultValue: 'bottomright',
+          defaultValue: 'topright',
           inputType: 'dropdown',
           inputChoices: ['topleft', 'topright', 'bottomleft', 'bottomright']
         },
@@ -218,6 +219,12 @@ limitations under the License.
           defaultValue: 'en',
           inputType: 'dropdown',
           inputChoices: ['en', 'zh', 'es', 'ru']
+        },
+
+        drawLayersRemovalFactor: {
+          type: Number,
+          defaultValue: 0,
+          inputType: 'number'
         },
 
         type: {

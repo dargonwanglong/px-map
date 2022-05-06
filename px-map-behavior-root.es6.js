@@ -335,6 +335,18 @@
       },
 
       /**
+       * The number used to trigger the drawn layers cleanning on Map.
+       *
+       * Drawn layers will be removed when drawLayersRemovalFactor value is changed.
+       */
+      drawLayersRemovalFactor: {
+        type: Number,
+        value: 0,
+        notify: true,
+        observer: 'shouldUpdateInst'
+      },
+
+      /**
        * The controls setting for the drawing toolbar.
        *
        * See https://github.com/geoman-io/leaflet-geoman
@@ -349,14 +361,32 @@
             rotateMode: false
           };
         }
+      },
+
+      /**
+       * The tooltip content of custom Finish button
+       */
+      drawFinishTitle: {
+        type: String,
+        value: 'Finish'
+      },
+
+      /**
+       * The class name of custom Finish button
+       */
+      drawFinishCls: {
+        type: String,
+        value: 'leaflet-pm-icon-rotate'
       }
     },
 
     addInst(parent) {
       PxMapBehavior.LeafletRootImpl.addInst.call(this, parent);
-
-      if (this.showDrawToolbar) {
-        this._addControls(this.drawToolbarPosition, this.drawControls, this.drawToolbarLanguage);
+      // add the controls
+      this._addControls(this.drawToolbarPosition, this.drawControls, this.drawToolbarLanguage);
+      // hide the controls if showDrawToolbar = false
+      if (!this.showDrawToolbar) {
+        this.elementInst.pm.toggleControls();
       }
     },
 
@@ -366,16 +396,18 @@
     },
 
     updateInst(lastOptions, nextOptions) {
-      if (lastOptions.showDrawToolbar !== nextOptions.showDrawToolbar || lastOptions.drawToolbarPosition !== nextOptions.drawToolbarPosition) {
-        // cannot use toggleControls as the drawControls setting cannot apply to
-        if (nextOptions.showDrawToolbar) {
-          this._addControls(nextOptions.drawToolbarPosition, nextOptions.drawControls, nextOptions.drawToolbarLanguage);
-        } else {
-          this._removeControls();
-        }
+      if (lastOptions.showDrawToolbar !== nextOptions.showDrawToolbar) {
+        this.elementInst.pm.toggleControls();
+        this._removeDrawnLayers();
+      }
+      if(lastOptions.drawToolbarPosition !== nextOptions.drawToolbarPosition) {
+        this._updateControlsPosition(nextOptions.drawToolbarPosition);
       }
       if(lastOptions.drawToolbarLanguage !== nextOptions.drawToolbarLanguage) {
         this.elementInst.pm.setLang(nextOptions.drawToolbarLanguage);
+      }
+      if(lastOptions.drawLayersRemovalFactor !== nextOptions.drawLayersRemovalFactor) {
+        this._removeDrawnLayers();
       }
 
       PxMapBehavior.LeafletRootImpl.updateInst.call(this, lastOptions, nextOptions);
@@ -387,6 +419,7 @@
       options.showDrawToolbar = this.showDrawToolbar;
       options.drawToolbarLanguage = this.drawToolbarLanguage;
       options.drawControls = this.drawControls;
+      options.drawLayersRemovalFactor = this.drawLayersRemovalFactor;
 
       return options;
     },
@@ -398,17 +431,31 @@
      * @param {*} language
      */
     _addControls(position, drawControls, language) {
+      // ignore all other shapes/layers which are not generated/drawn by leaflet-geoman
+      L.PM.setOptIn(true);
+
+      // adds the draw/edit buttons
       const options = Object.assign({position: position}, drawControls);
       this.elementInst.pm.addControls(options);
-      this.elementInst.pm.setLang(language);
 
-      const drawEndFn = this._handleDrawEnd.bind(this);
+      // bind events
+      const drawFinishedFn = this._handleDrawFinished.bind(this);
       const layerCreatedFn = this._handleShapeLayerCreated.bind(this);
       this.bindEvents({
-        'pm:drawend' : drawEndFn,
-        'pm:create' : layerCreatedFn,
-        'pm:remove': drawEndFn
+        'pm:create' : layerCreatedFn
       });
+
+      // creates custom button
+      this.elementInst.pm.Toolbar.createCustomControl({
+        name: 'customFinish',
+        block: 'custom',
+        title: this.drawFinishTitle,
+        onClick: drawFinishedFn,
+        className: this.drawFinishCls
+      });
+
+      // set language
+      this.elementInst.pm.setLang(language);
     },
 
     /**
@@ -416,22 +463,36 @@
      */
     _removeControls() {
       // remove all drawn layers
-      const layers = this.elementInst.pm.getGeomanDrawLayers();
-      layers.forEach(layer => layer.remove());
+      this._removeDrawnLayers();
       this.elementInst.pm.removeControls();
     },
 
+    _removeDrawnLayers() {
+      const layers = this.elementInst.pm.getGeomanDrawLayers();
+      layers.forEach(layer => layer.remove());
+    },
+
     /**
-     * Handle when the layer or shape is drawn/created and listen the layer's edit event.
+     * Update the drawing toolbar position
+     * @param {*} position
+     */
+    _updateControlsPosition(position) {
+      this.elementInst.pm.Toolbar.setBlockPosition('draw', position);
+      this.elementInst.pm.Toolbar.setBlockPosition('edit', position);
+      this.elementInst.pm.Toolbar.setBlockPosition('custom', position);
+    },
+
+    /**
+     * Handle when the layer or shape is drawn/created.
      *
      *
      * @param {*} e
      */
     _handleShapeLayerCreated(e) {
-      e.layer.on('pm:edit', ev => {
-        this._handleDrawEnd(ev);
-      });
-
+      // marke the layers drawn by leaflet-geoman editable
+      e.layer.setStyle({ pmIgnore: false });
+      e.layer.options.pmIgnore = false;
+      L.PM.reInitLayer(e.layer);
     },
 
     /**
@@ -440,16 +501,16 @@
      *
      * @param {*} evt
      */
-    _handleDrawEnd(evt) {
+    _handleDrawFinished(evt) {
       const layerFeatureCollection = this.elementInst.pm.getGeomanDrawLayers(true).toGeoJSON();
-      this.fire('px-map-draw-end', layerFeatureCollection);
+      this.fire('px-map-draw-finished', layerFeatureCollection);
     }
     /**
-     * Fired when the layer is drawn/edited by the user via the drawing tool.
+     * Fired when user clicking on the custom Finish button.
      *
      *   * {Object} detail - Contains the event details, the feature colletion of drawn polygons.
      *
-     * @event px-map-draw-end
+     * @event px-map-draw-finished
      */
   };
 
