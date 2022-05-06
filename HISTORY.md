@@ -1,3 +1,11 @@
+v3.19.16
+===================
+## Enhancement:
+* Refactor the drawing tool.
+* Add custom Finish button.
+* Make sure only the layers drawn by drawing tool are editable.
+* Support clean the drawn layers from outside of Map component.
+
 v3.19.15
 ===================
 ## New Feature:
