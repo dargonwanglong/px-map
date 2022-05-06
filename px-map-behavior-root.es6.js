@@ -434,6 +434,11 @@
       // ignore all other shapes/layers which are not generated/drawn by leaflet-geoman
       L.PM.setOptIn(true);
 
+      // make sure the this.elementInst.pm is initialized
+      if (!this.elementInst.pm) {
+        this.elementInst.pm = new L.PM.Map(this.elementInst);
+      }
+
       // adds the draw/edit buttons
       const options = Object.assign({position: position}, drawControls);
       this.elementInst.pm.addControls(options);
@@ -502,8 +507,18 @@
      * @param {*} evt
      */
     _handleDrawFinished(evt) {
-      const layerFeatureCollection = this.elementInst.pm.getGeomanDrawLayers(true).toGeoJSON();
-      this.fire('px-map-draw-finished', layerFeatureCollection);
+      const group = L.featureGroup();
+      const layers = this.elementInst.pm.getGeomanDrawLayers();
+      layers.forEach((layer) => {
+        if (layer instanceof L.Circle) {
+          // convert the circle layer to polygon layer
+          group.addLayer(L.PM.Utils.circleToPolygon(layer));
+        } else {
+          group.addLayer(layer);
+        }
+      });
+
+      this.fire('px-map-draw-finished', group.toGeoJSON());
     }
     /**
      * Fired when user clicking on the custom Finish button.
