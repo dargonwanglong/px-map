@@ -1,3 +1,9 @@
+v3.19.17
+===================
+## Bug Fix:
+* Make sure PM is initialized before using it.
+* Convert the circle layer to polygon layer otherwise it cannot be used as a polygon area.
+
 v3.19.16
 ===================
 ## Enhancement:
