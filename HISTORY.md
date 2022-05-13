@@ -1,3 +1,10 @@
+v3.19.18
+===================
+## Enhancement and Bug Fix:
+* Update custom Finish control's icon.
+* Clean all the drawn layers after custom Finish button is clicked.
+* Set `toggle` of custom Finish button as `false` to avoid duplicate clicking.
+
 v3.19.17
 ===================
 ## Bug Fix:
