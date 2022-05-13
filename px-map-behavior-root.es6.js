@@ -376,7 +376,7 @@
        */
       drawFinishCls: {
         type: String,
-        value: 'leaflet-pm-icon-rotate'
+        value: 'leaflet-pm-icon-checkmark'
       }
     },
 
@@ -456,6 +456,7 @@
         block: 'custom',
         title: this.drawFinishTitle,
         onClick: drawFinishedFn,
+        toggle: false,
         className: this.drawFinishCls
       });
 
@@ -517,6 +518,9 @@
           group.addLayer(layer);
         }
       });
+
+      // clean the drawn polygons
+      this._removeDrawnLayers();
 
       this.fire('px-map-draw-finished', group.toGeoJSON());
     }
