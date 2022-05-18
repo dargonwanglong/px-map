@@ -519,9 +519,6 @@
         }
       });
 
-      // clean the drawn polygons
-      this._removeDrawnLayers();
-
       this.fire('px-map-draw-finished', group.toGeoJSON());
     }
     /**

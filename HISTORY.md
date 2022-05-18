@@ -1,3 +1,8 @@
+v3.19.19
+===================
+## Change Request:
+* Don't clean the drawn layers after custom Finish button is clicked.
+
 v3.19.18
 ===================
 ## Enhancement and Bug Fix:
