@@ -1,3 +1,9 @@
+v3.19.20
+===================
+## Enhancement:
+* Enable/disable the custom Finish button when there is any/no drawn layer.
+* Upgrade the leaflet-geoman version to include new fixes/features from geoman-io/leaflet-geoman.
+
 v3.19.19
 ===================
 ## Change Request:
