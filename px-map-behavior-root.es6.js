@@ -358,7 +358,8 @@
             drawMarker: false,
             drawCircleMarker: false,
             drawPolyline: false,
-            rotateMode: false
+            rotateMode: false,
+            drawText: false
           };
         }
       },
@@ -444,19 +445,23 @@
       this.elementInst.pm.addControls(options);
 
       // bind events
-      const drawFinishedFn = this._handleDrawFinished.bind(this);
       const layerCreatedFn = this._handleShapeLayerCreated.bind(this);
+      const layerChangedFn = this._handleLayerChanged.bind(this);
       this.bindEvents({
-        'pm:create' : layerCreatedFn
+        'pm:create' : layerCreatedFn,
+        'pm:drawend' : layerChangedFn,
+        'pm:remove' : layerChangedFn
       });
 
       // creates custom button
+      const drawFinishedFn = this._handleDrawFinished.bind(this);
       this.elementInst.pm.Toolbar.createCustomControl({
         name: 'customFinish',
         block: 'custom',
         title: this.drawFinishTitle,
         onClick: drawFinishedFn,
         toggle: false,
+        disabled: true,
         className: this.drawFinishCls
       });
 
@@ -473,9 +478,29 @@
       this.elementInst.pm.removeControls();
     },
 
+    /**
+     * Remove the drawn layers
+     */
     _removeDrawnLayers() {
       const layers = this.elementInst.pm.getGeomanDrawLayers();
       layers.forEach(layer => layer.remove());
+      this._handleLayerChanged();
+    },
+
+    /**
+     * Whether has drawn layers
+     */
+    _hasDrawnLayers() {
+      const layers = this.elementInst.pm.getGeomanDrawLayers();
+      return layers && layers.length > 0;
+    },
+
+    /**
+     * Enalbe/Disable the custom Finish button
+     * @param {*} enable
+     */
+    _toggleFinishBtnEnalbeState(enable) {
+      this.elementInst.pm.Toolbar.setButtonDisabled('customFinish', !enable);
     },
 
     /**
@@ -490,8 +515,6 @@
 
     /**
      * Handle when the layer or shape is drawn/created.
-     *
-     *
      * @param {*} e
      */
     _handleShapeLayerCreated(e) {
@@ -499,6 +522,14 @@
       e.layer.setStyle({ pmIgnore: false });
       e.layer.options.pmIgnore = false;
       L.PM.reInitLayer(e.layer);
+    },
+
+    /**
+     * Handle the layer' drawend/removed events
+     * @param {*} e
+     */
+    _handleLayerChanged(e) {
+        this._toggleFinishBtnEnalbeState(this._hasDrawnLayers());
     },
 
     /**
