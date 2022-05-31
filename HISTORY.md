@@ -1,3 +1,8 @@
+v3.19.21
+===================
+## Enhancement:
+* Refine the enable/disable state management of the custom Finish button
+
 v3.19.20
 ===================
 ## Enhancement:
