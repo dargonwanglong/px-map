@@ -446,11 +446,12 @@
 
       // bind events
       const layerCreatedFn = this._handleShapeLayerCreated.bind(this);
-      const layerChangedFn = this._handleLayerChanged.bind(this);
+      const layerDrawEndFn = this._handleShapeLayerDrawEnd.bind(this);
+      const layerRemovedFn = this._handleShapeLayerRemoved.bind(this);
       this.bindEvents({
         'pm:create' : layerCreatedFn,
-        'pm:drawend' : layerChangedFn,
-        'pm:remove' : layerChangedFn
+        'pm:drawend' : layerDrawEndFn,
+        'pm:remove' : layerRemovedFn
       });
 
       // creates custom button
@@ -484,7 +485,7 @@
     _removeDrawnLayers() {
       const layers = this.elementInst.pm.getGeomanDrawLayers();
       layers.forEach(layer => layer.remove());
-      this._handleLayerChanged();
+      this._toggleFinishBtnEnalbeState(false);
     },
 
     /**
@@ -514,10 +515,28 @@
     },
 
     /**
+     * Bind the events for new added layers
+     * @param {*} layer
+     */
+    _bindLayerEvents(layer) {
+      // listen edit event of new added layer
+      layer.on('pm:edit', evt => {
+        this._toggleFinishBtnEnalbeState(true);
+      });
+
+      layer.on('pm:cut', evt => {
+        this._bindLayerEvents(evt.layer);
+      });
+    },
+
+    /**
      * Handle when the layer or shape is drawn/created.
      * @param {*} e
      */
     _handleShapeLayerCreated(e) {
+      // listen edit/cut event of new added layer
+      this._bindLayerEvents(e.layer);
+
       // marke the layers drawn by leaflet-geoman editable
       e.layer.setStyle({ pmIgnore: false });
       e.layer.options.pmIgnore = false;
@@ -525,11 +544,19 @@
     },
 
     /**
-     * Handle the layer' drawend/removed events
+     * Handle when the layer or shape is draw ended.
      * @param {*} e
      */
-    _handleLayerChanged(e) {
-        this._toggleFinishBtnEnalbeState(this._hasDrawnLayers());
+    _handleShapeLayerDrawEnd(e) {
+      this._toggleFinishBtnEnalbeState(true);
+    },
+
+    /**
+     * Handle when the layer or shape is removed.
+     * @param {*} e
+     */
+    _handleShapeLayerRemoved(e) {
+      this._toggleFinishBtnEnalbeState(this._hasDrawnLayers());
     },
 
     /**
@@ -551,6 +578,7 @@
       });
 
       this.fire('px-map-draw-finished', group.toGeoJSON());
+      this._toggleFinishBtnEnalbeState(false);
     }
     /**
      * Fired when user clicking on the custom Finish button.
