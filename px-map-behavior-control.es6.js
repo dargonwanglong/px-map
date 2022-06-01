@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-(function() {
+ (function() {
   'use strict';
 
   /****************************************************************************
@@ -33,7 +33,7 @@
     properties: {
       /**
        * Positions the control in one of the map corners. Choose from 'topright',
-       * 'topleft', 'bottomright', or 'bottomleft'.
+       * 'topleft', 'bottomright', 'bottomleft', 'bottom50right0 ', 'bottom50right320', 'bottom50left0' or 'bottom50left320'.
        *
        * @type {String}
        */
@@ -45,6 +45,7 @@
     },
 
     addInst(parent) {
+      this._createCustomControlCorners(parent);
       this.elementInst.addTo(parent);
     },
 
@@ -58,8 +59,30 @@
       }
     },
 
+    _createCustomControlCorners(parent) {
+      // Customized zoom control location for SB Map and Map Panel
+      const customControlCorners = ['bottom50right0 ', 'bottom50right320', 'bottom50left0', 'bottom50left320'];
+
+      const corners = parent._controlCorners;
+      const existingControlCorners = Object.keys(corners);
+      const l = 'leaflet-';
+      const container = parent._controlContainer;
+
+      const createCorner = (key) => {
+          const className = l + key;
+          corners[key] = L.DomUtil.create('div', className, container);
+      }
+
+      customControlCorners.forEach(key => {
+        if (!existingControlCorners.includes(key)) {
+          createCorner(key);
+        }
+      });
+    },
+
     _getValidPosition() {
-      const positionIsValid = (/^(topright|topleft|bottomright|bottomleft)$/.test(this.position));
+      // Customized zoom control location for SB Map and Map Panel
+      const positionIsValid = (/^(topright|topleft|bottomright|bottomleft|bottom50right0|bottom50right320|bottom50left0|bottom50left320)$/.test(this.position));
 
       if (!positionIsValid) {
         console.log(`PX-MAP CONFIGURATION ERROR:
@@ -69,6 +92,10 @@
           - 'topleft'
           - 'bottomright'
           - 'bottomleft'
+          - 'bottom50right0'
+          - 'bottom50right320'
+          - 'bottom50left0'
+          - 'bottom50left320'
           Defaulting to 'bottomright'.`);
 
         return 'bottomright';

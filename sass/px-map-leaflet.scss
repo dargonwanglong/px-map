@@ -30,7 +30,7 @@
  * Takes a simple URL path and returns a path that is linked to the location
  * in `bower_components` where we expect the leaflet assets to be.
  */
-@function relative-url($simple-url) {
+ @function relative-url($simple-url) {
   @return url('../leaflet/dist/#{$simple-url}');
 }
 
@@ -163,6 +163,42 @@
 }
 .leaflet-left {
   left: 0;
+}
+.leaflet-bottom50left0 {
+  left: 0;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  bottom: 50px;
+}
+.leaflet-bottom50left320 {
+  left: 320px;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  bottom: 50px;
+}
+.leaflet-bottom50right0 {
+  right: 0;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  bottom: 50px;
+}
+.leaflet-bottom50right320 {
+  right: 320px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  position: absolute;
+  z-index: 1000;
+  pointer-events: none;
+  bottom: 50px;
 }
 .leaflet-control {
   float: left;
