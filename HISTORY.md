@@ -1,3 +1,8 @@
+v3.19.22
+===================
+## Enhancement:
+* Add customized locations(bottom50right0 , bottom50right320, bottom50left0 and bottom50left320) for zoom control container.
+
 v3.19.21
 ===================
 ## Enhancement:
