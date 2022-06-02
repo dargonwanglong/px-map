@@ -33,7 +33,7 @@
     properties: {
       /**
        * Positions the control in one of the map corners. Choose from 'topright',
-       * 'topleft', 'bottomright', 'bottomleft', 'bottom50right0 ', 'bottom50right320', 'bottom50left0' or 'bottom50left320'.
+       * 'topleft', 'bottomright', 'bottomleft', 'bottom50right0', 'bottom50right320', 'bottom50left0' or 'bottom50left320'.
        *
        * @type {String}
        */
@@ -61,7 +61,7 @@
 
     _createCustomControlCorners(parent) {
       // Customized zoom control location for SB Map and Map Panel
-      const customControlCorners = ['bottom50right0 ', 'bottom50right320', 'bottom50left0', 'bottom50left320'];
+      const customControlCorners = ['bottom50right0', 'bottom50right320', 'bottom50left0', 'bottom50left320'];
 
       const corners = parent._controlCorners;
       const existingControlCorners = Object.keys(corners);
