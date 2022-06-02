@@ -1,3 +1,8 @@
+v3.19.23
+===================
+## Enhancement:
+* Correct customized location bottom50right0.
+
 v3.19.22
 ===================
 ## Enhancement:
