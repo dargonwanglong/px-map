@@ -60,7 +60,6 @@ limitations under the License.
           draw-toolbar-position="{{props.drawToolbarPosition.value}}"
           show-draw-toolbar="{{props.showDrawToolbar.value}}"
           draw-toolbar-language="{{props.drawToolbarLanguage.value}}"
-          draw-layers-removal-factor="{{props.drawLayersRemovalFactor.value}}"
           flex-to-size="{{props.flexToSize.value}}"
           disable-scroll-zoom="{{props.disableScrollZoom.value}}"
           disable-touch-zoom="{{props.disableTouchZoom.value}}"
@@ -164,7 +163,8 @@ limitations under the License.
 
       listeners: {
         'px-map-moved': 'mapMove',
-        'px-map-draw-finished': 'drawFinished'
+        'px-map-draw-finished': 'drawFinished',
+        'px-map-drawn-layer-changed': 'drawnLayerChanged'
       },
 
       mapMove: function(evt) {
@@ -173,6 +173,9 @@ limitations under the License.
       },
       drawFinished: function(evt) {
         console.log('There is the feature collection for the drawn polygon.', evt.detail);
+      },
+      drawnLayerChanged: function(evt) {
+        console.log('The drawn layer is changed, still has layer on map?', evt.detail);
       },
       /**
        * A reference for `this.props`. Read the documentation there.
@@ -219,12 +222,6 @@ limitations under the License.
           defaultValue: 'en',
           inputType: 'dropdown',
           inputChoices: ['en', 'zh', 'es', 'ru']
-        },
-
-        drawLayersRemovalFactor: {
-          type: Number,
-          defaultValue: 0,
-          inputType: 'number'
         },
 
         type: {

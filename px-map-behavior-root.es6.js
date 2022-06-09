@@ -335,18 +335,6 @@
       },
 
       /**
-       * The number used to trigger the drawn layers cleanning on Map.
-       *
-       * Drawn layers will be removed when drawLayersRemovalFactor value is changed.
-       */
-      drawLayersRemovalFactor: {
-        type: Number,
-        value: 0,
-        notify: true,
-        observer: 'shouldUpdateInst'
-      },
-
-      /**
        * The controls setting for the drawing toolbar.
        *
        * See https://github.com/geoman-io/leaflet-geoman
@@ -357,9 +345,11 @@
           return {
             drawMarker: false,
             drawCircleMarker: false,
+            drawRectangle: false,
             drawPolyline: false,
             rotateMode: false,
-            drawText: false
+            drawText: false,
+            editControls: false
           };
         }
       },
@@ -407,9 +397,6 @@
       if(lastOptions.drawToolbarLanguage !== nextOptions.drawToolbarLanguage) {
         this.elementInst.pm.setLang(nextOptions.drawToolbarLanguage);
       }
-      if(lastOptions.drawLayersRemovalFactor !== nextOptions.drawLayersRemovalFactor) {
-        this._removeDrawnLayers();
-      }
 
       PxMapBehavior.LeafletRootImpl.updateInst.call(this, lastOptions, nextOptions);
     },
@@ -420,7 +407,6 @@
       options.showDrawToolbar = this.showDrawToolbar;
       options.drawToolbarLanguage = this.drawToolbarLanguage;
       options.drawControls = this.drawControls;
-      options.drawLayersRemovalFactor = this.drawLayersRemovalFactor;
 
       return options;
     },
@@ -456,7 +442,7 @@
 
       // creates custom button
       const drawFinishedFn = this._handleDrawFinished.bind(this);
-      this.elementInst.pm.Toolbar.createCustomControl({
+      this.finishBtn = this.elementInst.pm.Toolbar.createCustomControl({
         name: 'customFinish',
         block: 'custom',
         title: this.drawFinishTitle,
@@ -468,6 +454,22 @@
 
       // set language
       this.elementInst.pm.setLang(language);
+      // disable controls' submenu/actions
+      this._disableActionsForControls();
+    },
+
+    /**
+     * Disable/remove the submenu/actions for controls
+     */
+    _disableActionsForControls() {
+      this.elementInst.pm.Toolbar.changeActionsOfControl('Rectangle', []);
+      this.elementInst.pm.Toolbar.changeActionsOfControl('Polygon', []);
+      this.elementInst.pm.Toolbar.changeActionsOfControl('Circle', []);
+
+      this.elementInst.pm.Toolbar.changeActionsOfControl('Cut', []);
+      this.elementInst.pm.Toolbar.changeActionsOfControl('editMode', []);
+      this.elementInst.pm.Toolbar.changeActionsOfControl('dragMode', []);
+      this.elementInst.pm.Toolbar.changeActionsOfControl('removalMode', []);
     },
 
     /**
@@ -483,9 +485,15 @@
      * Remove the drawn layers
      */
     _removeDrawnLayers() {
+      // remove all drawn layers
       const layers = this.elementInst.pm.getGeomanDrawLayers();
       layers.forEach(layer => layer.remove());
+      // remove the drawing layer
+      this.elementInst.pm.disableDraw();
+      // disable the Finish button
       this._toggleFinishBtnEnalbeState(false);
+
+      this.fire('px-map-drawn-layer-changed', { hasDrawnLayers: false });
     },
 
     /**
@@ -502,6 +510,17 @@
      */
     _toggleFinishBtnEnalbeState(enable) {
       this.elementInst.pm.Toolbar.setButtonDisabled('customFinish', !enable);
+      if (this.finishBtn) {
+        const btnContainer = this.finishBtn.getContainer();
+        const btnIcon = this.finishBtn.buttonsDomNode.getElementsByClassName('control-icon')[0];
+        if (enable) {
+          btnContainer.classList.add('blue-border');
+          btnIcon.classList.add('leaflet-pm-icon-checkmark-blue');
+        } else {
+          btnContainer.classList.remove('blue-border');
+          btnIcon.classList.remove('leaflet-pm-icon-checkmark-blue');
+        }
+      }
     },
 
     /**
@@ -549,6 +568,7 @@
      */
     _handleShapeLayerDrawEnd(e) {
       this._toggleFinishBtnEnalbeState(true);
+      this.fire('px-map-drawn-layer-changed', { hasDrawnLayers: true });
     },
 
     /**
@@ -556,7 +576,9 @@
      * @param {*} e
      */
     _handleShapeLayerRemoved(e) {
-      this._toggleFinishBtnEnalbeState(this._hasDrawnLayers());
+      const hasLayers = this._hasDrawnLayers();
+      this._toggleFinishBtnEnalbeState(hasLayers);
+      this.fire('px-map-drawn-layer-changed', { hasDrawnLayers: hasLayers });
     },
 
     /**
@@ -586,6 +608,14 @@
      *   * {Object} detail - Contains the event details, the feature colletion of drawn polygons.
      *
      * @event px-map-draw-finished
+     */
+
+    /**
+     * Fired when the layer is added/removed.
+     *
+     *   * {Object} detail - Contains the event details - flag to indicate still has drawn layers or not.
+     *
+     * @event px-map-drawn-layer-changed
      */
   };
 

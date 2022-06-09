@@ -1,3 +1,10 @@
+v3.19.24
+===================
+## Enhancement:
+* Refine the draw controls and the style of custom Finish button.
+* Remove useless prop `drawLayersRemovalFactor`
+* Add new event `px-map-drawn-layer-changed`
+
 v3.19.23
 ===================
 ## Enhancement:
