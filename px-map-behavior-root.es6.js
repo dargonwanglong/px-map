@@ -434,10 +434,12 @@
       const layerCreatedFn = this._handleShapeLayerCreated.bind(this);
       const layerDrawEndFn = this._handleShapeLayerDrawEnd.bind(this);
       const layerRemovedFn = this._handleShapeLayerRemoved.bind(this);
+      const removalModeToggledFn = this._handleRemovalModeToggled.bind(this);
       this.bindEvents({
         'pm:create' : layerCreatedFn,
         'pm:drawend' : layerDrawEndFn,
-        'pm:remove' : layerRemovedFn
+        'pm:remove' : layerRemovedFn,
+        'pm:globalremovalmodetoggled': removalModeToggledFn
       });
 
       // creates custom button
@@ -601,6 +603,16 @@
 
       this.fire('px-map-draw-finished', group.toGeoJSON());
       this._toggleFinishBtnEnalbeState(false);
+      this.elementInst.pm.disableGlobalRemovalMode();
+    },
+
+    /**
+     * Handle the event when removal mode is toggled.
+     *
+     * @param {*} evt
+     */
+    _handleRemovalModeToggled(evt) {
+      this.fire('px-map-removal-mode-changed', {removalEnabled: this.elementInst.pm.globalRemovalModeEnabled()});
     }
     /**
      * Fired when user clicking on the custom Finish button.
@@ -616,6 +628,14 @@
      *   * {Object} detail - Contains the event details - flag to indicate still has drawn layers or not.
      *
      * @event px-map-drawn-layer-changed
+     */
+
+    /**
+     * Fired when the removal mode is toggled.
+     *
+     *   * {Object} detail - Contains the event details - removal is enable or not.
+     *
+     * @event px-map-removal-mode-changed
      */
   };
 
