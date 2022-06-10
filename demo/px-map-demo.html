@@ -25,6 +25,7 @@ limitations under the License.
 <link rel="import" href="../../px-demo/px-demo-props.html" />
 <link rel="import" href="../../px-demo/px-demo-interactive.html" />
 <link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../px-map-control-zoom.html" />
 
 
 <!-- Imports for this component -->
@@ -72,6 +73,7 @@ limitations under the License.
             lng="{{props.lng.value}}"
             type="{{props.type.value}}">
           </px-map-marker-static>
+          <px-map-control-zoom position="bottomright"></px-map-control-zoom>
         </px-map>
       </div>
     </px-demo-component>
@@ -164,7 +166,8 @@ limitations under the License.
       listeners: {
         'px-map-moved': 'mapMove',
         'px-map-draw-finished': 'drawFinished',
-        'px-map-drawn-layer-changed': 'drawnLayerChanged'
+        'px-map-drawn-layer-changed': 'drawnLayerChanged',
+        'px-map-removal-mode-changed': 'removalModeChanged'
       },
 
       mapMove: function(evt) {
@@ -176,6 +179,9 @@ limitations under the License.
       },
       drawnLayerChanged: function(evt) {
         console.log('The drawn layer is changed, still has layer on map?', evt.detail);
+      },
+      removalModeChanged: function(evt) {
+        console.log('The removal mode is changed:', evt.detail);
       },
       /**
        * A reference for `this.props`. Read the documentation there.

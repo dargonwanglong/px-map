@@ -1,3 +1,9 @@
+v3.19.25
+===================
+## Enhancement:
+* Add new event `px-map-removal-mode-changed`
+* Refine the style of zoom controls and draw tools
+
 v3.19.24
 ===================
 ## Enhancement:

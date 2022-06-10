@@ -226,11 +226,11 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
   border-color: $px-map-control-button-border-color;
 
   border-radius: 15%;
-  line-height: calculateRem(36px);
-  font-size: calculateRem(20px);
+  line-height: calculateRem(18px);
+  font-size: calculateRem(10px);
   font-weight: 400;
-  width: calculateRem(40px);
-  height: calculateRem(40px);
+  width: calculateRem(30px);
+  height: calculateRem(30px);
 
   margin-bottom: $inuit-base-spacing-unit--tiny;
 
@@ -246,8 +246,8 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
 
 // Extends generic button to be round
 %map-control-button--round {
-  width: calculateRem(40px);
-  height: calculateRem(40px);
+  width: calculateRem(30px);
+  height: calculateRem(30px);
   position: relative;
   border-radius: 100%;
 }
