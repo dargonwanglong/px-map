@@ -172,12 +172,17 @@ limitations under the License.
 
       mapMove: function(evt) {
         var markers = Polymer.dom(evt).rootTarget.getVisibleMarkers();
+        if (Polymer.dom(evt).rootTarget.elementInst.pm) {
+          Polymer.dom(evt).rootTarget.elementInst.pm.disableDraw();
+        }
         console.log('There are ' + markers.length + ' markers visible on the map.');
       },
       drawFinished: function(evt) {
+        Polymer.dom(evt).rootTarget._removeDrawnLayers();
         console.log('There is the feature collection for the drawn polygon.', evt.detail);
       },
       drawnLayerChanged: function(evt) {
+        Polymer.dom(evt).rootTarget._toggleShapeBtnsEnableState(!evt.detail.hasDrawnLayers);
         console.log('The drawn layer is changed, still has layer on map?', evt.detail);
       },
       removalModeChanged: function(evt) {

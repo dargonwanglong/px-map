@@ -1,3 +1,9 @@
+v3.19.26
+===================
+## Enhancement:
+* Add new function `_toggleShapeBtnsEnableState` to enable/disable the shape creation buttons.
+* Enhance the logic of `_handleShapeLayerDrawEnd`.
+
 v3.19.25
 ===================
 ## Enhancement:

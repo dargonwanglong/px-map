@@ -526,6 +526,17 @@
     },
 
     /**
+     * Enable/Disable the shape buttons
+     *
+     * @param {*} enable
+     */
+    _toggleShapeBtnsEnableState(enable) {
+      this.elementInst.pm.Toolbar.setButtonDisabled('Rectangle', !enable);
+      this.elementInst.pm.Toolbar.setButtonDisabled('Polygon', !enable);
+      this.elementInst.pm.Toolbar.setButtonDisabled('Circle', !enable);
+    },
+
+    /**
      * Update the drawing toolbar position
      * @param {*} position
      */
@@ -566,11 +577,15 @@
 
     /**
      * Handle when the layer or shape is draw ended.
+     *
      * @param {*} e
      */
     _handleShapeLayerDrawEnd(e) {
-      this._toggleFinishBtnEnalbeState(true);
-      this.fire('px-map-drawn-layer-changed', { hasDrawnLayers: true });
+      // drawend event is triggerred as well when disable the draw for the first shape/layer
+      // can't use hasLayers = true directly here
+      const hasLayers = this._hasDrawnLayers();
+      this._toggleFinishBtnEnalbeState(hasLayers);
+      this.fire('px-map-drawn-layer-changed', { hasDrawnLayers: hasLayers });
     },
 
     /**
