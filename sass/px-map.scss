@@ -186,6 +186,10 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
   line-height: $px-map-marker-group-cluster-line-height;
 }
 
+.map-icon__highlight {
+  --internal-px-map-icon-border-color: #45ACE5;
+}
+
 /*******************************************************************************
  * POPUPS
  ******************************************************************************/

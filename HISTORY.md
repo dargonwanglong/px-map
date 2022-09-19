@@ -1,3 +1,10 @@
+v3.19.27
+===================
+## Enhancement:
+* Rise and highlight the selected marker for `px-map-marker-group`
+* Support cluster icon customization
+* Support show/hide tooltip configuration when highlighting the selected marker for `px-map-marker-group`
+
 v3.19.26
 ===================
 ## Enhancement:
