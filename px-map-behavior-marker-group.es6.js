@@ -365,11 +365,15 @@
                   this._bindAndOpenPopup(selectedFeature);
                   this._unspiderfyPreviousClusterIfNotParentOf(selectedFeature);
                 }
+
+                // should reset it at the end of this async block
+                this.markerClicked = false;
               });
             }
           };
         } else {
           this._markerCloseAllPopups();
+          this.markerClicked = false;
         }
       }
     },
@@ -965,6 +969,7 @@
           markerId: evt.layer.id // need markerId, so user can reset upon SingleMarkerTap
         };
         this.fire('px-map-marker-group-marker-tapped', detail);
+        this.markerClicked = true;
       }
 
       if (evt.layer && evt.layer.featureProperties && evt.layer.featureProperties.hasOwnProperty('marker-popup')) {
@@ -1032,14 +1037,19 @@
      */
 
     _bindAndOpenPopup(marker) {
-      if (!marker || !marker.bindPopup || !marker.openPopup || !this.openPopupOnSelect) return;
+      if (!marker || !marker.bindPopup || !marker.openPopup) return;
 
-      const popupSettings = this._featSettingsToProps(marker.featureProperties['marker-popup'], 'popup');
-      if (!popupSettings || !Object.keys(popupSettings).length) return;
+      // don't show the popup when openPopupOnSelect is false and not triggerred by marker clicking
+      // always show the popup when clicking the marker no matter the value of openPopupOnSelect
+      const shouldPopup = this.openPopupOnSelect || this.markerClicked;
+      if (shouldPopup) {
+        const popupSettings = this._featSettingsToProps(marker.featureProperties['marker-popup'], 'popup');
+        if (!popupSettings || !Object.keys(popupSettings).length) return;
+        const klassName = (popupSettings._Base && PxMap.hasOwnProperty(popupSettings._Base)) ? popupSettings._Base : 'InfoPopup';
+        const popup = new PxMap[klassName](popupSettings);
+        marker.bindPopup(popup).openPopup();
+      }
 
-      const klassName = (popupSettings._Base && PxMap.hasOwnProperty(popupSettings._Base)) ? popupSettings._Base : 'InfoPopup';
-      const popup = new PxMap[klassName](popupSettings);
-      marker.bindPopup(popup).openPopup();
       marker.__boundCloseFn = this._unbindAndClosePopup.bind(this, marker);
       marker.on('popupclose', marker.__boundCloseFn);
 
