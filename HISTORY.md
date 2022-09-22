@@ -1,3 +1,8 @@
+v3.19.28
+===================
+## Enhancement:
+* Don't show the popup for the marker when the `openPopupOnSelect` prop of `px-map-marker-group` is `FALSE` and is not triggered by marker clicking.
+
 v3.19.27
 ===================
 ## Enhancement:
