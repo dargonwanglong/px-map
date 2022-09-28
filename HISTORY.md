@@ -1,3 +1,8 @@
+v3.19.29
+===================
+## Enhancement:
+Enlarge the pin icon when highlighting the marker for `px-map-marker-group`
+
 v3.19.28
 ===================
 ## Enhancement:

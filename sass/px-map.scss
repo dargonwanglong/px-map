@@ -188,6 +188,10 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
 
 .map-icon__highlight {
   --internal-px-map-icon-border-color: #45ACE5;
+  --internal-px-map-icon-width: 50px;
+  --internal-px-map-icon-height: 50px;
+  --internal-px-map-icon-position-top: -10px;
+  --internal-px-map-icon-position-left: -5px;
 }
 
 /*******************************************************************************
