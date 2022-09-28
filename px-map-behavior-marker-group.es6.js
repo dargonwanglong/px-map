@@ -383,6 +383,15 @@
         marker.setZIndexOffset(this.riseZIndexOffset);
         if (this.riseClass && !L.DomUtil.hasClass(marker._icon, this.riseClass)) {
           L.DomUtil.addClass(marker._icon, this.riseClass);
+
+          // update the position of the popup when highlighting
+          const popup = marker.getPopup().getElement();
+          const bottomStyle = popup.style.bottom;
+          if (bottomStyle && bottomStyle.indexOf('px') !== -1) {
+            const bottomValue = bottomStyle.replace('px','');
+            // 10: should match to the value of --internal-px-map-icon-position-top
+            popup.style.bottom = (Math.floor(bottomValue) + 10) + 'px';
+          }
         }
       }
     },
