@@ -1,6 +1,6 @@
 {
   "name": "px-map",
-  "version": "3.19.29",
+  "version": "3.19.30",
   "description": "A lightweight framework for building interactive maps with web components",
   "main": [
     "px-map.html"

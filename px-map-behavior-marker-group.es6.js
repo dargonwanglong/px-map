@@ -1046,10 +1046,13 @@
      */
 
     _bindAndOpenPopup(marker) {
+      console.log('*** _bindAndOpenPopup');
       if (!marker || !marker.bindPopup || !marker.openPopup) return;
 
       // don't show the popup when openPopupOnSelect is false and not triggerred by marker clicking
       // always show the popup when clicking the marker no matter the value of openPopupOnSelect
+      console.log(`*** this.openPopupOnSelect: ${this.openPopupOnSelect}`);
+      console.log(`*** this.markerClicked: ${this.markerClicked}`);
       const shouldPopup = this.openPopupOnSelect || this.markerClicked;
       if (shouldPopup) {
         const popupSettings = this._featSettingsToProps(marker.featureProperties['marker-popup'], 'popup');
