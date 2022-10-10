@@ -1,3 +1,49 @@
+v3.19.29
+===================
+## Enhancement:
+Enlarge the pin icon when highlighting the marker for `px-map-marker-group`
+
+v3.19.28
+===================
+## Enhancement:
+* Don't show the popup for the marker when the `openPopupOnSelect` prop of `px-map-marker-group` is `FALSE` and is not triggered by marker clicking.
+
+v3.19.27
+===================
+## Enhancement:
+* Rise and highlight the selected marker for `px-map-marker-group`
+* Support cluster icon customization
+* Support show/hide tooltip configuration when highlighting the selected marker for `px-map-marker-group`
+
+v3.19.26
+===================
+## Enhancement:
+* Add new function `_toggleShapeBtnsEnableState` to enable/disable the shape creation buttons.
+* Enhance the logic of `_handleShapeLayerDrawEnd`.
+
+v3.19.25
+===================
+## Enhancement:
+* Add new event `px-map-removal-mode-changed`
+* Refine the style of zoom controls and draw tools
+
+v3.19.24
+===================
+## Enhancement:
+* Refine the draw controls and the style of custom Finish button.
+* Remove useless prop `drawLayersRemovalFactor`
+* Add new event `px-map-drawn-layer-changed`
+
+v3.19.23
+===================
+## Enhancement:
+* Correct customized location bottom50right0.
+
+v3.19.22
+===================
+## Enhancement:
+* Add customized locations(bottom50right0 , bottom50right320, bottom50left0 and bottom50left320) for zoom control container.
+
 v3.19.21
 ===================
 ## Enhancement:

@@ -178,6 +178,7 @@
        *   - {String} `polygonOptions.fillColor`: [default=--px-map-marker-group-cluster-polygon-fill-color] Sets the fill color color, prefer setting with the style variable.
        *   - {Number} `polygonOptions.fillOpacity`: [default=0.4] Sets the opacity of the polygon fill
        * - {Object} `spiderLegPolylineOptions`: [default=undefined] Sets the style for the marker spiderfy legs, see [PolylineOptions](http://leafletjs.com/reference.html#polyline-options)
+       * - {String} `clusterIcon`: [default=''] Specify a predefined icon (defined in `px-map-behavior-icon`) as the cluster icon. `iconFns` has higher priority than it.
        *
        * @type {Object}
        */
@@ -196,6 +197,45 @@
         notify: true
       },
 
+      /**
+       * Indicate whether need to open the popup when selecting a marker.
+       */
+      openPopupOnSelect: {
+        type: Boolean,
+        value: true,
+        observer: 'shouldUpdateInst',
+        notify: true
+      },
+
+      /**
+       * Indicate whether bring the selected marker to top
+       */
+      riseOnSelect: {
+        type: Boolean,
+        value: false,
+        observer: 'shouldUpdateInst',
+        notify: true
+      },
+
+      /**
+       * The z-index offset of highlighted/selected marker
+       */
+      riseZIndexOffset: {
+        type: Number,
+        value: 250,
+        observer: 'shouldUpdateInst',
+        notify: true
+      },
+
+      /**
+       * The highlight class for selected marker
+       */
+      riseClass: {
+        type: String,
+        value: 'map-icon__highlight',
+        observer: 'shouldUpdateInst',
+        notify: true
+      },
     },
 
     // PUBLIC METHODS
@@ -320,18 +360,40 @@
                     && selectedFeature.__parent._markers
                     && selectedFeature.__parent._markers.length > 1) {
                   this._fireEventOnMarkerOrVisibleParentCluster(selectedFeature);
+                  this._highlightMarkerIfNeeded(selectedFeature);
                 } else {
                   this._bindAndOpenPopup(selectedFeature);
                   this._unspiderfyPreviousClusterIfNotParentOf(selectedFeature);
                 }
+
+                // should reset it at the end of this async block
+                this.markerClicked = false;
               });
             }
           };
         } else {
           this._markerCloseAllPopups();
+          this.markerClicked = false;
         }
       }
+    },
 
+    _highlightMarkerIfNeeded(marker) {
+      if (this.riseOnSelect) {
+        marker.setZIndexOffset(this.riseZIndexOffset);
+        if (this.riseClass && !L.DomUtil.hasClass(marker._icon, this.riseClass)) {
+          L.DomUtil.addClass(marker._icon, this.riseClass);
+
+          // update the position of the popup when highlighting
+          const popup = marker.getPopup().getElement();
+          const bottomStyle = popup.style.bottom;
+          if (bottomStyle && bottomStyle.indexOf('px') !== -1) {
+            const bottomValue = bottomStyle.replace('px','');
+            // 10: should match to the value of --internal-px-map-icon-position-top
+            popup.style.bottom = (Math.floor(bottomValue) + 10) + 'px';
+          }
+        }
+      }
     },
 
     _fireEventOnMarkerOrVisibleParentCluster(marker) {
@@ -404,6 +466,11 @@
       options.iconCreateFunction = this._createClusterIcon.bind(this);
 
       options.opened = this.opened;
+      options.riseOnSelect = this.riseOnSelect;
+      options.riseZIndexOffset = this.riseZIndexOffset;
+      options.riseClass = this.riseClass;
+      options.openPopupOnSelect = this.openPopupOnSelect;
+
       // Return the options composed together
       return options;
     },
@@ -502,6 +569,12 @@
       // to that function and return the result.
       if (this.iconFns.cluster) {
         return this.iconFns.cluster.call(this, cluster);
+      }
+
+      const { clusterIcon } = this.getInstOptions();
+      if (clusterIcon) {
+        const klassName = this._strToKlassName(clusterIcon);
+        return new PxMap[klassName]();
       }
 
       // Otherwise, build the marker ourselves
@@ -905,6 +978,7 @@
           markerId: evt.layer.id // need markerId, so user can reset upon SingleMarkerTap
         };
         this.fire('px-map-marker-group-marker-tapped', detail);
+        this.markerClicked = true;
       }
 
       if (evt.layer && evt.layer.featureProperties && evt.layer.featureProperties.hasOwnProperty('marker-popup')) {
@@ -972,14 +1046,22 @@
      */
 
     _bindAndOpenPopup(marker) {
+      console.log('*** _bindAndOpenPopup');
       if (!marker || !marker.bindPopup || !marker.openPopup) return;
 
-      const popupSettings = this._featSettingsToProps(marker.featureProperties['marker-popup'], 'popup');
-      if (!popupSettings || !Object.keys(popupSettings).length) return;
+      // don't show the popup when openPopupOnSelect is false and not triggerred by marker clicking
+      // always show the popup when clicking the marker no matter the value of openPopupOnSelect
+      console.log(`*** this.openPopupOnSelect: ${this.openPopupOnSelect}`);
+      console.log(`*** this.markerClicked: ${this.markerClicked}`);
+      const shouldPopup = this.openPopupOnSelect || this.markerClicked;
+      if (shouldPopup) {
+        const popupSettings = this._featSettingsToProps(marker.featureProperties['marker-popup'], 'popup');
+        if (!popupSettings || !Object.keys(popupSettings).length) return;
+        const klassName = (popupSettings._Base && PxMap.hasOwnProperty(popupSettings._Base)) ? popupSettings._Base : 'InfoPopup';
+        const popup = new PxMap[klassName](popupSettings);
+        marker.bindPopup(popup).openPopup();
+      }
 
-      const klassName = (popupSettings._Base && PxMap.hasOwnProperty(popupSettings._Base)) ? popupSettings._Base : 'InfoPopup';
-      const popup = new PxMap[klassName](popupSettings);
-      marker.bindPopup(popup).openPopup();
       marker.__boundCloseFn = this._unbindAndClosePopup.bind(this, marker);
       marker.on('popupclose', marker.__boundCloseFn);
 

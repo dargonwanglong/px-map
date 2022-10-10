@@ -186,6 +186,14 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
   line-height: $px-map-marker-group-cluster-line-height;
 }
 
+.map-icon__highlight {
+  --internal-px-map-icon-border-color: #45ACE5;
+  --internal-px-map-icon-width: 50px;
+  --internal-px-map-icon-height: 50px;
+  --internal-px-map-icon-position-top: -10px;
+  --internal-px-map-icon-position-left: -5px;
+}
+
 /*******************************************************************************
  * POPUPS
  ******************************************************************************/
@@ -226,11 +234,11 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
   border-color: $px-map-control-button-border-color;
 
   border-radius: 15%;
-  line-height: calculateRem(36px);
-  font-size: calculateRem(20px);
+  line-height: calculateRem(18px);
+  font-size: calculateRem(10px);
   font-weight: 400;
-  width: calculateRem(40px);
-  height: calculateRem(40px);
+  width: calculateRem(30px);
+  height: calculateRem(30px);
 
   margin-bottom: $inuit-base-spacing-unit--tiny;
 
@@ -246,8 +254,8 @@ $px-map-marker-locate-icon-accuracy-opacity:        var(--px-map-marker-locate-i
 
 // Extends generic button to be round
 %map-control-button--round {
-  width: calculateRem(40px);
-  height: calculateRem(40px);
+  width: calculateRem(30px);
+  height: calculateRem(30px);
   position: relative;
   border-radius: 100%;
 }

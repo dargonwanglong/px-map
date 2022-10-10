@@ -1,6 +1,6 @@
 {
   "name": "px-map",
-  "version": "3.19.21",
+  "version": "3.19.30",
   "description": "A lightweight framework for building interactive maps with web components",
   "main": [
     "px-map.html"
@@ -36,7 +36,7 @@
     "leaflet-google-tiles": "ge-smallworld/leaflet-google-layer#^1.0.0",
     "px-icon-set": "^2.0.0",
     "px-app-helpers": "^2.0.0",
-    "leaflet-geoman-free": "git+https://github.com/ServiceMax-Engineering/leaflet-geoman.git#2.13.0"
+    "leaflet-geoman-free": "git+https://github.com/ServiceMax-Engineering/leaflet-geoman.git#2.13.1"
   },
   "devDependencies": {
     "px-clearfix-design": "^1.0.0",

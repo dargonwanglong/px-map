@@ -25,6 +25,7 @@ limitations under the License.
 <link rel="import" href="../../px-demo/px-demo-props.html" />
 <link rel="import" href="../../px-demo/px-demo-interactive.html" />
 <link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../px-map-control-zoom.html" />
 
 
 <!-- Imports for this component -->
@@ -60,7 +61,6 @@ limitations under the License.
           draw-toolbar-position="{{props.drawToolbarPosition.value}}"
           show-draw-toolbar="{{props.showDrawToolbar.value}}"
           draw-toolbar-language="{{props.drawToolbarLanguage.value}}"
-          draw-layers-removal-factor="{{props.drawLayersRemovalFactor.value}}"
           flex-to-size="{{props.flexToSize.value}}"
           disable-scroll-zoom="{{props.disableScrollZoom.value}}"
           disable-touch-zoom="{{props.disableTouchZoom.value}}"
@@ -73,6 +73,7 @@ limitations under the License.
             lng="{{props.lng.value}}"
             type="{{props.type.value}}">
           </px-map-marker-static>
+          <px-map-control-zoom position="bottomright"></px-map-control-zoom>
         </px-map>
       </div>
     </px-demo-component>
@@ -164,15 +165,28 @@ limitations under the License.
 
       listeners: {
         'px-map-moved': 'mapMove',
-        'px-map-draw-finished': 'drawFinished'
+        'px-map-draw-finished': 'drawFinished',
+        'px-map-drawn-layer-changed': 'drawnLayerChanged',
+        'px-map-removal-mode-changed': 'removalModeChanged'
       },
 
       mapMove: function(evt) {
         var markers = Polymer.dom(evt).rootTarget.getVisibleMarkers();
+        if (Polymer.dom(evt).rootTarget.elementInst.pm) {
+          Polymer.dom(evt).rootTarget.elementInst.pm.disableDraw();
+        }
         console.log('There are ' + markers.length + ' markers visible on the map.');
       },
       drawFinished: function(evt) {
+        Polymer.dom(evt).rootTarget._removeDrawnLayers();
         console.log('There is the feature collection for the drawn polygon.', evt.detail);
+      },
+      drawnLayerChanged: function(evt) {
+        Polymer.dom(evt).rootTarget._toggleShapeBtnsEnableState(!evt.detail.hasDrawnLayers);
+        console.log('The drawn layer is changed, still has layer on map?', evt.detail);
+      },
+      removalModeChanged: function(evt) {
+        console.log('The removal mode is changed:', evt.detail);
       },
       /**
        * A reference for `this.props`. Read the documentation there.
@@ -219,12 +233,6 @@ limitations under the License.
           defaultValue: 'en',
           inputType: 'dropdown',
           inputChoices: ['en', 'zh', 'es', 'ru']
-        },
-
-        drawLayersRemovalFactor: {
-          type: Number,
-          defaultValue: 0,
-          inputType: 'number'
         },
 
         type: {

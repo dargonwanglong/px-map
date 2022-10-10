@@ -32,13 +32,15 @@
 // ICON BODY
 .map-icon-symbol__body {
   display: block;
-  width: 40px;
-  height: 40px;
+  width: var(--internal-px-map-icon-width, 40px);
+  height: var(--internal-px-map-icon-height, 40px);
   background-color: var(--internal-px-map-icon-info-color);
   border-radius: 100%;
   position: absolute;
   border: 2px solid var(--internal-px-map-icon-border-color);
   padding: var(--px-map-icon-symbol-padding, 8px);
+  top: var(--internal-px-map-icon-position-top, unset);
+  left: var(--internal-px-map-icon-position-left, unset);
 }
 
 // ICON DESCENDER
